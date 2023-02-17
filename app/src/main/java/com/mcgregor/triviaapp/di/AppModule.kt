@@ -1,6 +1,7 @@
 package com.mcgregor.triviaapp.di
 
 import com.mcgregor.triviaapp.network.QuestionApi
+import com.mcgregor.triviaapp.repository.QuestionRepository
 import com.mcgregor.triviaapp.util.Constants
 import dagger.Module
 import dagger.Provides
@@ -13,6 +14,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Singleton
+    @Provides
+    fun provideQuestionRepository(api: QuestionApi) = QuestionRepository(api)
+
     @Singleton
     @Provides
     //this question api is one and the same thing with dao, because it connects directly to get all questions
