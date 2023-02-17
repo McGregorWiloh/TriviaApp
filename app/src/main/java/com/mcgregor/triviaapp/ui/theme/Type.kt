@@ -1,4 +1,4 @@
-package com.example.triviaapp.ui.theme
+package com.mcgregor.triviaapp.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

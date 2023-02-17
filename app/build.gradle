@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.triviaapp'
+    namespace 'com.mcgregor.triviaapp'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.triviaapp"
+        applicationId "com.mcgregor.triviaapp"
         minSdk 24
         targetSdk 33
         versionCode 1

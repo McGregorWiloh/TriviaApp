@@ -1,4 +1,4 @@
-package com.example.triviaapp
+package com.mcgregor.triviaapp
 
 import org.junit.Test
 
