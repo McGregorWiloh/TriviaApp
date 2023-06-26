@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,7 @@ import com.mcgregor.triviaapp.viewmodel.QuestionsViewModel
 fun Questions(viewModel: QuestionsViewModel) {
 
     val questions = viewModel.data.value.data?.toMutableList()
+    var totalNumberOfQuestions = 0
     val questionIndex = remember {
         mutableStateOf(0)
     }
@@ -49,11 +52,12 @@ fun Questions(viewModel: QuestionsViewModel) {
     } else {
         val question = try {
             questions?.get(questionIndex.value)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             null
         }
         if (questions != null) {
-            QuestionDisplay(question = question!!, questionIndex, viewModel) {
+            totalNumberOfQuestions = questions.size
+            QuestionDisplay(question = question!!, questionIndex, totalNumberOfQuestions) {
                 questionIndex.value = questionIndex.value + 1
             }
 
@@ -66,7 +70,7 @@ fun Questions(viewModel: QuestionsViewModel) {
 fun QuestionDisplay(
     question: QuestionItem,
     questionIndex: MutableState<Int>,
-    viewModel: QuestionsViewModel,
+    totalNumberOfQuestions: Int,
     onNextClicked: (Int) -> Unit
 ) {
     val choicesState = remember(question) { question.choices.toMutableList() }
@@ -94,7 +98,8 @@ fun QuestionDisplay(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            QuestionTracker(counter = questionIndex.value+1, outOf = 100)
+            if (questionIndex.value >= 3) ShowProgress(score = questionIndex.value+1)
+            QuestionTracker(counter = questionIndex.value + 1, outOf = totalNumberOfQuestions)
             DrawDottedLine(pathEffect = pathEffect)
 
             Column {
@@ -214,6 +219,49 @@ fun DrawDottedLine(pathEffect: PathEffect) {
 }
 
 @Composable
+fun ShowProgress(score: Int) {
+    val gradient = Brush.linearGradient(listOf(Color(0xfff95075), Color(0xffbe6be5)))
+    val progressFactor = remember(score) {
+        mutableStateOf(score * 0.0005f)
+    }
+    Row(
+        modifier = Modifier
+            .padding(3.dp)
+            .fillMaxWidth()
+            .height(45.dp)
+            .border(
+                width = 4.dp,
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        AppColors.mLightPurple,
+                        AppColors.mLightPurple
+                    )
+                ), shape = RoundedCornerShape(34.dp)
+            )
+            .clip(
+                RoundedCornerShape(
+                    topStartPercent = 50,
+                    topEndPercent = 50,
+                    bottomStartPercent = 50,
+                    bottomEndPercent = 50
+                )
+            )
+            .background(Color.Transparent), verticalAlignment = Alignment.CenterVertically
+    ) {
+        Button(
+            contentPadding = PaddingValues(1.dp),
+            onClick = { },
+            modifier = Modifier
+                .fillMaxWidth(progressFactor.value)
+                .background(brush = gradient), enabled = false, elevation = null, colors = buttonColors(backgroundColor = Color.Transparent, disabledBackgroundColor = Color.Transparent)
+        ) {
+            Text(text = score.toString(), modifier = Modifier.clip(shape = RoundedCornerShape(23.dp))
+                .fillMaxHeight(0.87f).fillMaxWidth().padding(6.dp), color = AppColors.mOffWhite, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Composable
 fun QuestionTracker(counter: Int, outOf: Int) {
     Text(
         text = buildAnnotatedString {
@@ -242,4 +290,17 @@ fun QuestionTracker(counter: Int, outOf: Int) {
             }
         }, modifier = Modifier.padding(20.dp)
     )
+}
+
+fun calculateProgressBar(questionIndex: Int, totalQuestions: Int): Int {
+
+    //ToDo
+
+    var progressPercentage = 0
+    var oneOfHundred = totalQuestions%100
+    val incrementNumber = oneOfHundred
+    return if(questionIndex >= oneOfHundred) {
+        oneOfHundred += incrementNumber
+        (progressPercentage++)
+    } else -1
 }
